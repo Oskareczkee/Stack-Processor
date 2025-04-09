@@ -17,8 +17,6 @@ private:
 	float resize_factor = 2;
 	void resize();
 	void resize(const float& resize_factor);
-	void resize_to_fit(const int& fit); //resizes array, so it can fit given size, and then resizes to reserve size
-	void resize_to_fit(const int& fit, const float& resize_factor); //resizes array, so it can fit given size, and then resizes to reserve size using given resize_factor
 
 public:
 	dynamic_array(): arr(new T[DYNAMIC_ARR_INITIAL_SIZE]), reserved_size(DYNAMIC_ARR_INITIAL_SIZE), item_count(0) {} //no arg ctor
@@ -34,14 +32,9 @@ public:
 	const T& operator[] (size_t idx) const;
 
 	void add_back(T item);
-	void add_front(T item);
 	void remove(const size_t& index);
 	void remove_back();
 	void remove_front();
-
-	void reverse(); //reverses the array
-	void append(const dynamic_array<T>& other);
-	void append_front(const dynamic_array<T>& other);
 
 	T& back() const; //gets item from the back
 	T& front() const; //gets item from the front
@@ -58,11 +51,11 @@ inline void dynamic_array<T>::resize()
 	if (resize_factor <= 0)
 		throw std::runtime_error("Resize factor must be greater than zero!");
 
-	if (reserved_size * resize_factor < item_count)
-		throw std::runtime_error("dynamic_array::resize() -> cannot resize, size after is less than item_count");
-
 	T* copy = new T[item_count];
 	std::copy(arr, arr + item_count, copy);
+
+	if (reserved_size * resize_factor < item_count)
+		throw std::runtime_error("dynamic_array::resize() -> cannot resize, size after is less than item_count");
 
 	reserved_size *= resize_factor; //floor is applied automatically
 	delete[] arr; //remove resources from the array
@@ -86,42 +79,6 @@ inline void dynamic_array<T>::resize(const float& resize_factor)
 	resize(); //resize with new resize factor
 	this->resize_factor = r_factor_copy; //restore old resize_factor
 }
-
-template<class T>
-inline void dynamic_array<T>::resize_to_fit(const int& fit)
-{
-	if (fit <= 0)
-		throw std::runtime_error("dynamic_array::resize_to_fit -> fit must be greater than zero!");
-
-	if(fit * resize_factor < item_count)
-		throw std::runtime_error("dynamic_array::resize_to_fit() -> cannot resize, size after is less than item_count");
-
-	T* copy = new T[item_count];
-	std::copy(arr, arr + item_count, copy);
-
-	reserved_size = fit * resize_factor;
-	delete[] arr;
-
-	arr = new T[reserved_size];
-	std::copy(copy, copy + item_count, arr);
-
-	delete[] copy; //free memory after copy
-}
-
-template<class T>
-inline void dynamic_array<T>::resize_to_fit(const int& fit, const float& resize_factor)
-{
-	if (resize_factor <= 0)
-		throw std::runtime_error("dynamic_array::resize_to_fit() -> resize_factor in dynamic array must be greater than zero!");
-
-	//copy the resize factor 
-	float r_factor_copy = this.resize_factor;
-	this->resize_factor = resize_factor;
-
-	resize_to_fit(fit); //resize with new resize factor
-	this->resize_factor = r_factor_copy; //restore old resize_factor
-}
-
 
 template<class T>
 inline dynamic_array<T>::~dynamic_array()
@@ -160,19 +117,6 @@ inline void dynamic_array<T>::add_back(T item)
 }
 
 template<class T>
-inline void dynamic_array<T>::add_front(T item)
-{
-	if (item_count >= reserved_size)
-		resize();
-
-	//shift all elements 1 position to right
-	std::move(arr, arr + item_count, arr + 1);
-
-	arr[0] = item;
-	item_count++;
-}
-
-template<class T>
 inline void dynamic_array<T>::remove(const size_t& index)
 {
 	if (index >= item_count)
@@ -198,32 +142,6 @@ inline void dynamic_array<T>::remove_front()
 		throw std::out_of_range("dynamic_array::remove_front() -> array is empty");
 
 	this->remove(0);
-}
-
-template<class T>
-inline void dynamic_array<T>::reverse()
-{
-	std::reverse(arr, arr + item_count);
-}
-
-template<class T>
-inline void dynamic_array<T>::append(const dynamic_array<T>& other)
-{
-	if (item_count + other.item_count >= reserved_size)
-		resize_to_fit(item_count + other.item_count); //we use resize to fit, cause usual resize might resize too little memory
-	std::copy(other.arr, other.arr + other.item_count, arr + item_count); //append at the end
-	item_count += other.item_count;
-}
-
-template<class T>
-inline void dynamic_array<T>::append_front(const dynamic_array<T>& other)
-{
-	if (item_count + other.item_count >= reserved_size)
-		resize_to_fit(item_count + other.item_count); //we use resize to fit, cause usual resize might resize too little memory
-
-	std::move(arr, arr + item_count, arr + other.item_count); //make space for everything
-	std::copy(other.arr, other.arr + other.item_count, arr); //append at the beginning
-	item_count += other.item_count;
 }
 
 template<class T>

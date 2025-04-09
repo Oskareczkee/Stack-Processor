@@ -5,13 +5,9 @@ enum class PROGRAM_TOKENS {
 	SWAP_TOP = ';',
 	COPY_INDEX = '@',
 	READ_CHARACTER = '.',
-	MINUS = '-',
+	MINUS='-',
 	ABS = '^', //Absolute value
-	PRINT_FIRST_CHAR_AND_POP = '>',
-	POP_NUMBER_PUT_AS_CHARACTER = ']',
-	POP_NUMBER_PUT_FIRST_ASCII = '[',
-	POP_APPEND_TOP = '#',
-	DETACH_FIRST_PUT_TOP = '$',
+	PRINT_FIRST_CHAR_AND_POP='>',
 	PRINT_STACK='&'
 
 	//add more here

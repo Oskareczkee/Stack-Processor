@@ -43,28 +43,13 @@ void stack_processor::next_instruction()
 	case (int)PROGRAM_TOKENS::PRINT_STACK:
 		print_stack();
 		break;
+
 	case (int)PROGRAM_TOKENS::PRINT_FIRST_CHAR_AND_POP:
 		print_first_char_and_pop();
 		break;
-	case (int)PROGRAM_TOKENS::POP_NUMBER_PUT_AS_CHARACTER:
-		pop_number_put_as_character();
+	default: //DEFAULT CASE: INPUT TOKEN
+		append_to_top(as_digit(instruction));
 		break;
-	case (int)PROGRAM_TOKENS::POP_NUMBER_PUT_FIRST_ASCII:
-		pop_number_put_first_ascii();
-		break;
-	case (int)PROGRAM_TOKENS::DETACH_FIRST_PUT_TOP:
-		detach_first_put_top();
-		break;
-	case (int)PROGRAM_TOKENS::POP_APPEND_TOP:
-		pop_append_top();
-		break;
-	default: { //DEFAULT CASE: INPUT TOKEN, convert to digit if is digit, otherwise save as character
-			if (is_digit(instruction))
-				append_to_top(as_digit(instruction));
-			else
-				append_to_top(instruction);
-			break;
-		}
 	}
 
 	next_instruction();
@@ -102,31 +87,9 @@ int stack_processor::list_to_int(const dynamic_array<int>& list)
 	int out = 0;
 
 	for (int x = size; x >= last_index; x--)
-		out += list[x] * pow(10, power++);
+		out += list[x] * pow(10, power);
 
 	return out * minus;
-}
-
-dynamic_array<int> stack_processor::number_to_list(int number)
-{
-	//TODO: write recursive version of this
-	dynamic_array<int> digits(STACK_PROCESSOR_RESERVE_LIST_SIZE);
-	bool is_minus = false;
-
-	if (number < 0)
-		is_minus = true;
-
-	while (number > 0) {
-		digits.add_back(number % 10);
-		number /= 10;
-	}
-
-	if (is_minus)
-		digits.add_back((char)PROGRAM_TOKENS::MINUS);
-
-	digits.reverse(); //order is reversed, reverse it
-
-	return digits;
 }
 
 void stack_processor::append_to_top(char character)
@@ -188,35 +151,6 @@ void stack_processor::copy_top()
 {
 	dynamic_array<int> top = this->memory.top();
 	this->memory.add_top(top);
-}
-
-void stack_processor::pop_number_put_as_character()
-{
-	int number = list_to_int(this->memory.pop_top());
-	put_empty_list_on_stack();
-	this->memory.top().add_back((char)number);
-}
-
-void stack_processor::pop_number_put_first_ascii()
-{
-	int first = this->memory.top().back(); //remember, this could be character, so number can have more than 1 digit
-	this->memory.pop_top();
-	this->memory.add_top(number_to_list(first));
-}
-
-void stack_processor::pop_append_top()
-{
-	dynamic_array<int> list = this->memory.pop_top();
-	this->memory.top().append(list);
-}
-
-void stack_processor::detach_first_put_top()
-{
-	int first_char = this->memory.top().back();
-	this->memory.top().remove_back();
-
-	put_empty_list_on_stack();
-	this->memory.top().add_back(first_char);
 }
 
 void stack_processor::read_character()

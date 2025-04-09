@@ -29,7 +29,6 @@ private:
 	char digit_to_character(const int& digit); //converts digit back into its character form
 
 	int list_to_int(const dynamic_array<int>& list); //converts data stored in list to number
-	dynamic_array<int> number_to_list(int number);
 
 public:
 	stack_processor(): memory(dynamic_stack<dynamic_array<int>>(STACK_PROCESSOR_RESERVE_STACK_SIZE)),
@@ -49,11 +48,6 @@ public:
 	void swap_top(); //TOKEN -> SWAP_TOP
 	void copy_index(); //TOKEN -> SWAP_INDEX
 	void copy_top(); //TOKEN -> COPY_LIST_ON_TOP
-
-	void pop_number_put_as_character();//TOKEN -> POP_NUMBER_PUT_AS_CHARACTER
-	void pop_number_put_first_ascii();//TOKEN -> POP_NUMBER_PUT_FIRST_ASCII
-	void pop_append_top();
-	void detach_first_put_top();
 
 
 	void read_character(); //reads character from given input (can be standard input) and puts it onto the top of the stack

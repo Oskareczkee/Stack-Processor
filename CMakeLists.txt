@@ -12,7 +12,7 @@ endif()
 project ("Stack Processor")
 
 # Dodaj źródło do pliku wykonywalnego tego projektu.
-add_executable (CMakeTarget "Stack Processor.cpp" "Stack Processor.h" "data_structures/dynamic_array.h"  "data_structures/dynamic_stack.h" "stack_processor/stack_processor.h" "stack_processor/tokens.h" "stack_processor/stack_processor.cpp")
+add_executable (CMakeTarget "StackProcessor.cpp" "StackProcessor.h" "data_structures/dynamic_array.h"  "data_structures/dynamic_stack.h" "stack_processor/stack_processor.h" "stack_processor/tokens.h" "stack_processor/stack_processor.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET CMakeTarget PROPERTY CXX_STANDARD 20)
