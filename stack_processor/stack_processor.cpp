@@ -6,68 +6,89 @@ void stack_processor::load_program(std::istream& stream)
 	while (stream.get(ch) && ch!='\n') {
 		this->program.add_back(ch);
 	}
+
+	program_size = this->program.size();
 }
 
 void stack_processor::next_instruction()
 {
-	//TODO: store program size in variable
-	if (this->instruction_ptr >= this->program.size())
-		return;
+	while (this->instruction_ptr < program_size){
 
-	char instruction = this->program[this->instruction_ptr];
-	this->instruction_ptr++;
+		char instruction = this->program[this->instruction_ptr];
+		this->instruction_ptr++;
 
-	switch (instruction)
-	{
-	case (int)PROGRAM_TOKENS::PUT_EMPTY_LIST_ON_STACK:
-		put_empty_list_on_stack();
-		break;
-	case (int)PROGRAM_TOKENS::COPY_LIST_ON_TOP:
-		copy_top();
-		break;
-	case (int)PROGRAM_TOKENS::COPY_INDEX:
-		copy_index();
-		break;
-	case (int)PROGRAM_TOKENS::SWAP_TOP:
-		swap_top();
-		break;
-	case (int)PROGRAM_TOKENS::READ_CHARACTER:
-		read_character();
-		break;
-	case (int)PROGRAM_TOKENS::MINUS:
-		append_minus();
-		break;
-	case (int)PROGRAM_TOKENS::ABS:
-		absolute_value();
-		break;
-	case (int)PROGRAM_TOKENS::PRINT_STACK:
-		print_stack();
-		break;
-	case (int)PROGRAM_TOKENS::PRINT_FIRST_CHAR_AND_POP:
-		print_first_char_and_pop();
-		break;
-	case (int)PROGRAM_TOKENS::POP_NUMBER_PUT_AS_CHARACTER:
-		pop_number_put_as_character();
-		break;
-	case (int)PROGRAM_TOKENS::POP_NUMBER_PUT_FIRST_ASCII:
-		pop_number_put_first_ascii();
-		break;
-	case (int)PROGRAM_TOKENS::DETACH_FIRST_PUT_TOP:
-		detach_first_put_top();
-		break;
-	case (int)PROGRAM_TOKENS::POP_APPEND_TOP:
-		pop_append_top();
-		break;
-	default: { //DEFAULT CASE: INPUT TOKEN, convert to digit if is digit, otherwise save as character
-			if (is_digit(instruction))
-				append_to_top(as_digit(instruction));
-			else
-				append_to_top(instruction);
+		switch (instruction)
+		{
+		case (int)PROGRAM_TOKENS::PUT_EMPTY_LIST_ON_STACK:
+			put_empty_list_on_stack();
 			break;
+		case (int)PROGRAM_TOKENS::COPY_LIST_ON_TOP:
+			copy_top();
+			break;
+		case (int)PROGRAM_TOKENS::COPY_INDEX:
+			copy_index();
+			break;
+		case (int)PROGRAM_TOKENS::SWAP_TOP:
+			swap_top();
+			break;
+		case (int)PROGRAM_TOKENS::READ_CHARACTER:
+			read_character();
+			break;
+
+		case (int)PROGRAM_TOKENS::MINUS:
+			append_minus();
+			break;
+		case (int)PROGRAM_TOKENS::PLUS:
+			plus();
+			break;
+		case (int)PROGRAM_TOKENS::ABS:
+			absolute_value();
+			break;
+
+		case (int)PROGRAM_TOKENS::PRINT_STACK:
+			print_stack();
+			break;
+		case (int)PROGRAM_TOKENS::PRINT_FIRST_CHAR_AND_POP:
+			print_first_char_and_pop();
+			break;
+		case (int)PROGRAM_TOKENS::POP_NUMBER_PUT_AS_CHARACTER:
+			pop_number_put_as_character();
+			break;
+		case (int)PROGRAM_TOKENS::POP_NUMBER_PUT_FIRST_ASCII:
+			pop_number_put_first_ascii();
+			break;
+		case (int)PROGRAM_TOKENS::DETACH_FIRST_PUT_TOP:
+			detach_first_put_top();
+			break;
+		case (int)PROGRAM_TOKENS::POP_APPEND_TOP:
+			pop_append_top();
+			break;
+
+		case (int)PROGRAM_TOKENS::LESS_THAN:
+			less_than();
+			break;
+		case (int)PROGRAM_TOKENS::EQUALS:
+			equals();
+			break;
+		case (int)PROGRAM_TOKENS::NEGATION:
+			negation();
+			break;
+
+		case (int)PROGRAM_TOKENS::PUT_INSTRUCTION_NUMBER:
+			put_instruction_number();
+			break;
+		case (int)PROGRAM_TOKENS::CONDITIONAL_JUMP:
+			conditional_jump();
+			break;
+		default: { //DEFAULT CASE: INPUT TOKEN, convert to digit if is digit, otherwise save as character
+				if (is_digit(instruction))
+					append_to_top(as_digit(instruction));
+				else
+					append_to_top(instruction);
+				break;
+			}
 		}
 	}
-
-	next_instruction();
 }
 
 bool stack_processor::is_digit(const char& character)
@@ -92,13 +113,21 @@ char stack_processor::digit_to_character(const int& digit)
 	return digit + '0';
 }
 
+bool stack_processor::is_logical_zero(const dynamic_array<int>& list)
+{
+	if (list.is_empty() ||  //is empty
+		(list.size() == 1 && list.back() == 0)) //has only '0' in it
+		return true;
+	return false;
+}
+
 int stack_processor::list_to_int(const dynamic_array<int>& list)
 {
 	//TODO: use write recursive version of this
 	int power = 0;
 	int size = list.size() - 1;
-	int minus = digit_to_character(list.front())=='-' ? -1 : 1;
-	int last_index = minus == -1 ? 1 : 0; //if minus is present, then on the last index will be minus sign, which we will carry later
+	int minus = (list.front()=='-' ? -1 : 1);
+	int last_index = (minus == -1 ? 1 : 0); //if minus is present, then on the last index will be minus sign, which we will carry later
 	int out = 0;
 
 	for (int x = size; x >= last_index; x--)
@@ -113,8 +142,10 @@ dynamic_array<int> stack_processor::number_to_list(int number)
 	dynamic_array<int> digits(STACK_PROCESSOR_RESERVE_LIST_SIZE);
 	bool is_minus = false;
 
-	if (number < 0)
+	if (number < 0) {
 		is_minus = true;
+		number *= -1; //otherwise loop won't work
+	}
 
 	while (number > 0) {
 		digits.add_back(number % 10);
@@ -146,6 +177,15 @@ void stack_processor::append_minus()
 		this->memory.top().remove_back();
 	else
 		this->memory.top().add_back((char)PROGRAM_TOKENS::MINUS);
+}
+
+void stack_processor::plus()
+{
+	int n1 = list_to_int(this->memory.pop_top());
+	int n2 = list_to_int(this->memory.pop_top());
+
+	dynamic_array<int> out = number_to_list(n1 + n2);
+	this->memory.add_top(out);
 }
 
 void stack_processor::absolute_value()
@@ -219,6 +259,64 @@ void stack_processor::detach_first_put_top()
 	this->memory.top().add_back(first_char);
 }
 
+void stack_processor::less_than()
+{
+	int a = list_to_int(this->memory.pop_top());
+	int b = list_to_int(this->memory.pop_top());
+
+	put_empty_list_on_stack();
+
+	if (b < a)
+		this->memory.top().add_back(1);
+	else
+		this->memory.top().add_back(0);
+}
+
+void stack_processor::equals()
+{
+	int a = list_to_int(this->memory.pop_top());
+	int b = list_to_int(this->memory.pop_top());
+	put_empty_list_on_stack();
+
+	if (a == b)
+		this->memory.top().add_back(1);
+	else
+		this->memory.top().add_back(0);
+}
+
+void stack_processor::negation()
+{
+	if (is_logical_zero(this->memory.top())) //has only '0' in it
+	{
+		this->memory.pop_top();
+		put_empty_list_on_stack();
+		this->memory.top().add_back(1);
+	}
+	else
+	{
+		this->memory.pop_top();
+		put_empty_list_on_stack();
+		this->memory.top().add_back(0);
+	}
+}
+
+void stack_processor::put_instruction_number()
+{
+	dynamic_array<int> intstruction_number = number_to_list(this->instruction_ptr);
+	this->memory.add_top(intstruction_number);
+}
+
+void stack_processor::conditional_jump()
+{
+	dynamic_array<int> top_list = this->memory.pop_top();
+	bool condition = !is_logical_zero(this->memory.pop_top()); //if is zero, then condition is false, otherwise true
+
+	if (!condition)
+		this->memory.add_top(top_list);
+	else
+		this->instruction_ptr = list_to_int(top_list);
+}
+
 void stack_processor::read_character()
 {
 	char ch = this->input_stream.get();
@@ -249,7 +347,7 @@ void stack_processor::print_first_char_and_pop()
 	int first = this->memory.top().back();
 	char character = is_character(first) ? first : digit_to_character(first);
 
-	output_stream << character<<"\n";
+	output_stream << character;
 	this->memory.pop_top();
 }
 

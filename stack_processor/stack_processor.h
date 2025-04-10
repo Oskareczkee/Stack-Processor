@@ -13,7 +13,8 @@ class stack_processor
 {
 private:
 	dynamic_stack<dynamic_array<int>> memory;
-	long instruction_ptr;
+	long instruction_ptr = 0;
+	long program_size = 0;
 	dynamic_array<char> program;
 
 	std::istream& input_stream = std::cin;
@@ -27,6 +28,7 @@ private:
 	bool is_character(const int& number);
 	int as_digit(const char& digit_character); //this function does not check if character is really digit
 	char digit_to_character(const int& digit); //converts digit back into its character form
+	bool is_logical_zero(const dynamic_array<int>& list);
 
 	int list_to_int(const dynamic_array<int>& list); //converts data stored in list to number
 	dynamic_array<int> number_to_list(int number);
@@ -43,6 +45,7 @@ public:
 
 
 	void append_minus(); //TOKEN -> MINUS
+	void plus();
 	void absolute_value(); //TOKEN -> ABS
 
 	void put_empty_list_on_stack(); //TOKEN -> PUT_EMPTY_LIST_ON_STACK
@@ -52,9 +55,14 @@ public:
 
 	void pop_number_put_as_character();//TOKEN -> POP_NUMBER_PUT_AS_CHARACTER
 	void pop_number_put_first_ascii();//TOKEN -> POP_NUMBER_PUT_FIRST_ASCII
-	void pop_append_top();
-	void detach_first_put_top();
+	void pop_append_top(); //TOKEN -> POP_APPEND_TOP
+	void detach_first_put_top(); //TOKEN -> DETACH_FIRST_PUT_TOP
 
+	void less_than(); //TOKEN -> LESS_THAN
+	void equals(); //TOKEN -> EQUALS
+	void negation(); //TOKEN -> NEGATION
+	void put_instruction_number(); //TOKEN -> PUT_INSTRUCTION_NUMBER
+	void conditional_jump(); //TOKEN -> JUMP
 
 	void read_character(); //reads character from given input (can be standard input) and puts it onto the top of the stack
 	void print_stack(); //print current stack state (can be file stream, standard output stream  etc...)

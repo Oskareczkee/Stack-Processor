@@ -6,12 +6,20 @@ enum class PROGRAM_TOKENS {
 	COPY_INDEX = '@',
 	READ_CHARACTER = '.',
 	MINUS = '-',
+	PLUS = '+',
 	ABS = '^', //Absolute value
 	PRINT_FIRST_CHAR_AND_POP = '>',
 	POP_NUMBER_PUT_AS_CHARACTER = ']',
 	POP_NUMBER_PUT_FIRST_ASCII = '[',
 	POP_APPEND_TOP = '#',
 	DETACH_FIRST_PUT_TOP = '$',
+
+	LESS_THAN='<',
+	EQUALS='=',
+	NEGATION='!',
+	PUT_INSTRUCTION_NUMBER='~',
+	CONDITIONAL_JUMP='?',
+
 	PRINT_STACK='&'
 
 	//add more here

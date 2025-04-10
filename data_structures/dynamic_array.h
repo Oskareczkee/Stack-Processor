@@ -47,7 +47,7 @@ public:
 	T& front() const; //gets item from the front
 
 	size_t size() const;
-	bool is_empty();
+	bool is_empty() const;
 
 	//add more functionalities if needed
 };
@@ -251,7 +251,7 @@ inline size_t dynamic_array<T>::size() const
 }
 
 template<class T>
-inline bool dynamic_array<T>::is_empty()
+inline bool dynamic_array<T>::is_empty() const
 {
 	return item_count<=0;
 }
