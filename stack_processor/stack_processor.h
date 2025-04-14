@@ -33,6 +33,12 @@ private:
 	int list_to_int(const dynamic_array<int>& list); //converts data stored in list to number
 	dynamic_array<int> number_to_list(int number);
 
+	bool list_number_equal(const dynamic_array<int>& n1, const dynamic_array<int>& n2);
+	bool list_less_than(const dynamic_array<int>& n1, const dynamic_array<int>& n2);
+
+	int skip_leading_zeroes_recursive(const dynamic_array<int>& n1, int index); //recursive version of skipping leading zeroes
+	bool compare_digits_recursive(const dynamic_array<int>& n1, const dynamic_array<int>& n2, int n1_iter, int n2_iter, bool is_n1_minus); //recursive version of comparing digits
+
 public:
 	stack_processor(): memory(dynamic_stack<dynamic_array<int>>(STACK_PROCESSOR_RESERVE_STACK_SIZE)),
 					   program(dynamic_array<char>(STACK_PROCESSOR_RESERVE_PROGRAM_SIZE)),
@@ -49,6 +55,7 @@ public:
 	void absolute_value(); //TOKEN -> ABS
 
 	void put_empty_list_on_stack(); //TOKEN -> PUT_EMPTY_LIST_ON_STACK
+	void remove_list_from_top(); // TOKEN -> REMOVE_LIST_FROM_TOP
 	void swap_top(); //TOKEN -> SWAP_TOP
 	void copy_index(); //TOKEN -> SWAP_INDEX
 	void copy_top(); //TOKEN -> COPY_LIST_ON_TOP
@@ -62,7 +69,7 @@ public:
 	void equals(); //TOKEN -> EQUALS
 	void negation(); //TOKEN -> NEGATION
 	void put_instruction_number(); //TOKEN -> PUT_INSTRUCTION_NUMBER
-	void conditional_jump(); //TOKEN -> JUMP
+	bool conditional_jump(); //TOKEN -> JUMP, returns true if jump occured, false otherwise
 
 	void read_character(); //reads character from given input (can be standard input) and puts it onto the top of the stack
 	void print_stack(); //print current stack state (can be file stream, standard output stream  etc...)
